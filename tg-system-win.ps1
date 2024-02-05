@@ -1,0 +1,7 @@
+$OutputPath = "${HOME}\"; $System = (Get-WmiObject -Class Win32_ComputerSystem); $Bios = (Get-WmiObject -Class Win32_BIOS); $Processor = (Get-CimInstance -ClassName Win32_Processor); $Ram = (Get-CimInstance -ClassName Win32_PhysicalMemory); $Storage = (Get-PhysicalDisk); $Os = (Get-CimInstance -ClassName Win32_OperatingSystem); $Output = [PSCustomObject]@{ "Device Name" = $System.Name; "Device Manufacturer" = $System.Manufacturer; "Device Model" = $System.Model; "Device Serial Number" = $Bios.SerialNumber; "Processor" = $Processor.Name; "RAM Capacity" = '{0:N1} GB' -f (($Ram | Measure-Object -Property Capacity -Sum).sum / 1GB); "RAM Type" = $Ram.SMBIOSMemoryType -join ", "; "RAM Manufacturer" = $Ram.Manufacturer -join ", "; "RAM Serial" = $Ram.SerialNumber -join ", "; "Storage Capacity" = ($Storage.Size | ForEach-Object { '{0:N1} GB' -f ($_ / 1GB) })  -join ", "; "Storage Type" = $Storage.MediaType -join ", "; "Storage BusType" = $Storage.BusType -join ", "; "Storage Model" = $Storage.Model -join ", "; "Storage Serial" = $Storage.SerialNumber -join ", "; "OS" = $Os.Caption; "OS Version" = $Os.Version; "OS Build" = $Os.BuildType; "OS Architecture" = $Os.OSArchitecture }; $Date = Get-Date -Format "yyMMddHHmmss"; $FileName = "${env:COMPUTERNAME}_CollectSystemInfo_$Date"; $Output | Export-Csv -Path (${OutputPath}+${FileName}+".csv") -NoTypeInformation -Encoding utf8; explorer $OutputPath; Write-Host "Process done. Check your Home Directory ${OutputPath}, a new file was created with the name ${FileName}.csv"
+
+
+
+
+
+
